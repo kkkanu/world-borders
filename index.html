@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>세계 국경 변천</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+<style>
+  :root{
+    --blue:#3182f6;
+    --blue-dark:#1b64da;
+    --blue-weak:#e8f3ff;
+    --ink:#191f28;
+    --sub:#8b95a1;
+    --hint:#b0b8c1;
+    --surface:#f2f4f6;
+    --line:#e5e8eb;
+    --green:#03b26c;
+    --red:#f04452;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{
+    background:#fff;color:var(--ink);
+    font-family:'Pretendard','Nanum Gothic',-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:1024px;margin:0 auto;padding:20px;}
+  .title{font-size:22px;font-weight:700;letter-spacing:-0.3px;}
+  .sub{font-size:14px;color:var(--sub);margin-top:4px;}
+
+  /* 연도 슬라이더 + 실시간 말풍선 */
+  .slider-area{position:relative;margin-top:14px;padding-top:40px;}
+  .bubble{
+    position:absolute;top:0;left:0;transform:translateX(-50%);
+    background:var(--blue);color:#fff;font-size:14px;font-weight:700;
+    padding:5px 12px;border-radius:999px;white-space:nowrap;pointer-events:none;
+  }
+  .bubble::after{
+    content:'';position:absolute;left:50%;top:100%;transform:translateX(-50%);
+    border:5px solid transparent;border-top-color:var(--blue);
+  }
+  .yr{
+    -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;outline:none;margin:0 0 8px;
+    background:linear-gradient(to right,var(--blue) 0,var(--blue) var(--p,44%),var(--line) var(--p,44%),var(--line) 100%);
+  }
+  .yr::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;border:none;box-shadow:0 2px 8px rgba(25,31,40,.18);cursor:pointer;}
+  .yr::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;border:none;box-shadow:0 2px 8px rgba(25,31,40,.18);cursor:pointer;}
+  .scale{display:flex;justify-content:space-between;font-size:13px;color:var(--sub);}
+
+  /* 지구본 + 정보 패널 */
+  .stage{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:12px;margin-top:14px;}
+  .globe-box{position:relative;height:460px;border-radius:16px;background:var(--surface);overflow:hidden;}
+  #globe{display:block;width:100%;height:100%;touch-action:none;cursor:grab;}
+  #globe.grabbing{cursor:grabbing;}
+  .status{position:absolute;left:0;right:0;bottom:14px;text-align:center;font-size:13px;color:var(--sub);pointer-events:none;}
+
+  .card{background:var(--surface);border-radius:16px;padding:18px;display:flex;flex-direction:column;}
+  .label{font-size:14px;color:var(--sub);}
+  .pick{font-size:22px;font-weight:700;margin:4px 0 10px;min-height:28px;word-break:keep-all;}
+  .row{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line);gap:8px;}
+  .row:first-of-type{border-top:none;padding-top:0;}
+  .val{font-size:16px;font-weight:600;text-align:right;}
+  .row > .label{white-space:nowrap;}
+  .small{font-size:12px;color:var(--sub);font-weight:400;margin-top:3px;}
+  .chip{display:inline-block;background:var(--blue-weak);color:var(--blue-dark);border-radius:8px;padding:4px 10px;font-size:13px;font-weight:600;}
+  .chip-red{background:#fdecee;color:var(--red);}
+  .btn{background:var(--blue);color:#fff;border:none;border-radius:12px;padding:14px 18px;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer;margin-top:auto;}
+  .btn:hover{background:var(--blue-dark);}
+  .note{font-size:12px;color:var(--hint);margin-top:14px;line-height:1.6;}
+
+  @media (max-width:760px){
+    .stage{grid-template-columns:1fr;}
+    .card{order:2;}
+    .globe-box{height:62vh;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div>
+    <div class="title">세계 국경 변천</div>
+    <div class="sub">슬라이더로 연도를 고르고 지구본을 돌려 보세요</div>
+  </div>
+
+  <div class="slider-area">
+    <div class="bubble" id="bubble">1900년</div>
+    <input class="yr" id="yearRange" type="range" min="1800" max="2026" step="1" value="1900" aria-label="연도" />
+    <div class="scale"><span>1800년</span><span>2026년</span></div>
+  </div>
+
+  <div class="stage">
+    <div class="globe-box">
+      <svg id="globe" role="img" aria-label="드래그로 회전하는 세계 국경 지구본">
+        <title>세계 국경 지구본</title>
+        <desc>끌어서 회전하고, 국가를 누르면 그 나라가 가운데로 옵니다.</desc>
+        <path id="sphere"></path>
+        <path id="grid"></path>
+        <g id="lands"></g>
+        <g id="labels"></g>
+      </svg>
+      <div class="status" id="status">데이터를 불러오는 중…</div>
+    </div>
+
+    <div class="card">
+      <div class="label">선택한 국가</div>
+      <div class="pick" id="pickName">—</div>
+      <div class="row">
+        <span class="label">기준 연도</span>
+        <span class="val"><span id="yearLabel">1900년</span><div class="small" id="snapNote">데이터 1900년 기준</div></span>
+      </div>
+      <div class="row">
+        <span class="label">분쟁 지역</span>
+        <span class="val" id="disputeVal"><span class="chip">없음</span></span>
+      </div>
+      <div class="row">
+        <span class="label">경계 정확도</span>
+        <span class="val" id="precVal">—</span>
+      </div>
+      <button class="btn" id="resetBtn">처음 위치로</button>
+    </div>
+  </div>
+
+  <div class="note" id="note">데이터 출처: historical-basemaps (GPL-3.0). 선택한 연도에 자료가 없으면 가장 가까운 앞 시점의 국경을 씁니다.</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+/* ==================================================================
+   세계 국경 변천
+   - 지구본: d3-geo 정사영 투영 (뒷면은 자동으로 잘림)
+   - 데이터: data/world_<연도>.geojson (historical-basemaps, GPL-3.0)
+   - 연도: 1800~2026. 자료가 있는 시점은 14개이며, 그 사이 연도는
+           가장 가까운 앞 시점의 자료를 씁니다.
+   ================================================================== */
+
+var YEARS = [1800,1815,1878,1880,1900,1914,1920,1930,1938,1945,1960,1994,2000,2010];
+var DATA_DIR = 'data/';
+var INIT_ROT = [-110, -20, 0];
+
+// 경계 정확도 (BORDERPRECISION 1~3)
+var PREC = {
+  3: ['국제법 기준', '#03b26c'],
+  2: ['중간 정확도', '#1b64da'],
+  1: ['근사 경계',   '#d97706']
+};
+
+// 분쟁 지역 "A vs B" 표기 (데이터의 NAME 기준). 필요할 때 항목을 추가합니다.
+var DISPUTES = {
+  // "국가명": "A vs B"
+};
+
+// 자주 나오는 국가명 한글 표기. 없으면 원래 영문 이름을 씁니다.
+var KO = {
+  "Imperial Japan":"일본 제국","Empire of Japan":"일본 제국","Japan":"일본",
+  "Korea":"한국","Korea, Republic of":"대한민국","Korea, Democratic People's Republic of":"조선민주주의인민공화국",
+  "China":"중국","Qing Empire":"청나라","Manchu Empire":"청나라","Manchuria":"만주","Xinjiang":"신장","Tibet":"티베트",
+  "Mongolia":"몽골","Taiwan":"타이완","Hong Kong":"홍콩",
+  "Russia":"러시아","Russian Empire":"러시아 제국","USSR":"소련","Byelarus":"벨라루스",
+  "United States":"미국","United States of America":"미국",
+  "United Kingdom":"영국","United Kingdom of Great Britain and Ireland":"영국",
+  "British Raj":"영국령 인도","India":"인도","Pakistan":"파키스탄","Bangladesh":"방글라데시",
+  "Ceylon":"실론","Sri Lanka":"스리랑카","Nepal":"네팔","Bhutan":"부탄","Afghanistan":"아프가니스탄",
+  "Ottoman Empire":"오스만 제국","Ottoman Sultanate":"오스만 제국","Republic of Turkey":"튀르키예 공화국","Turkey":"튀르키예",
+  "Persia":"페르시아","Iran":"이란","Iraq":"이라크","Syria":"시리아","Israel":"이스라엘","Jordan":"요르단",
+  "Lebanon":"레바논","Saudi Arabia":"사우디아라비아","Arabia":"아라비아","Hejaz":"헤자즈","Nejd":"네지드",
+  "Yemen":"예멘","Oman":"오만","Kuwait":"쿠웨이트","Qatar":"카타르","United Arab Emirates":"아랍에미리트","Bahrain":"바레인",
+  "Egypt":"이집트","Sudan":"수단","Anglo-Egyptian Sudan":"앵글로-이집트령 수단","Libya":"리비아","Algeria":"알제리",
+  "Tunisia":"튀니지","Morocco":"모로코","Ethiopia":"에티오피아","Abyssinia":"아비시니아","Eritrea":"에리트레아",
+  "Somalia":"소말리아","Kenya":"케냐","Uganda":"우간다","Tanzania, United Republic of":"탄자니아","Rwanda":"르완다",
+  "Burundi":"부룬디","Congo":"콩고","Zaire":"자이르","Belgian Congo":"벨기에령 콩고","Angola":"앙골라",
+  "Mozambique":"모잠비크","Madagascar":"마다가스카르","Zambia":"잠비아","Zimbabwe":"짐바브웨","Malawi":"말라위",
+  "Namibia":"나미비아","Botswana":"보츠와나","Lesotho":"레소토","Swaziland":"스와질란드",
+  "South Africa":"남아프리카 공화국","Union of South Africa":"남아프리카 연방","Cape Colony":"케이프 식민지",
+  "Orange Free State":"오렌지 자유국","Transvaal":"트란스발","Natal":"나탈",
+  "Nigeria":"나이지리아","Ghana":"가나","Gold Coast":"황금해안","Ivory Coast":"코트디부아르",
+  "Senegal":"세네갈","Mali":"말리","Niger":"니제르","Chad":"차드","Cameroon":"카메룬","Gabon":"가봉",
+  "Liberia":"라이베리아","Sierra Leone":"시에라리온","Guinea":"기니","Togo":"토고","Benin":"베냉","Dahomey":"다호메이",
+  "Burkina Faso":"부르키나파소","Mauritania":"모리타니","Djibouti":"지부티","Gambia":"감비아","Gambia, The":"감비아",
+  "Central African Republic":"중앙아프리카 공화국","Equatorial Guinea":"적도 기니","Guinea-Bissau":"기니비사우",
+  "Western Sahara":"서사하라","Spanish Sahara":"스페인령 사하라",
+  "Thailand":"태국","Siam":"시암","Vietnam":"베트남","Annam":"안남","Tonkin":"통킹","Cochin China":"코친차이나",
+  "French Indochina":"프랑스령 인도차이나","Burma":"버마","Cambodia":"캄보디아","Laos":"라오스",
+  "Malaysia":"말레이시아","Singapore":"싱가포르","Brunei":"브루나이","Indonesia":"인도네시아",
+  "Dutch East Indies":"네덜란드령 동인도","Philippines":"필리핀",
+  "Australia":"호주","New Zealand":"뉴질랜드","Papua New Guinea":"파푸아뉴기니","Fiji":"피지","Samoa":"사모아",
+  "Tonga":"통가","Antarctica":"남극","Greenland":"그린란드","Kingdom of Hawaii":"하와이 왕국",
+  "Canada":"캐나다","Mexico":"멕시코","Guatemala":"과테말라","Honduras":"온두라스","Nicaragua":"니카라과",
+  "Costa Rica":"코스타리카","Panama":"파나마","El Salvador":"엘살바도르","Belize":"벨리즈","Cuba":"쿠바",
+  "Haiti":"아이티","Dominican Republic":"도미니카 공화국","Puerto Rico":"푸에르토리코","Jamaica":"자메이카",
+  "Bahamas":"바하마","Barbados":"바베이도스","Trinidad":"트리니다드","Guyana":"가이아나","Suriname":"수리남",
+  "Brazil":"브라질","Kingdom of Brazil":"브라질 왕국","Argentina":"아르헨티나","Chile":"칠레","Peru":"페루",
+  "Bolivia":"볼리비아","Paraguay":"파라과이","Uruguay":"우루과이","Ecuador":"에콰도르","Colombia":"콜롬비아",
+  "Venezuela":"베네수엘라",
+  "Portugal":"포르투갈","Spain":"스페인","France":"프랑스","Germany":"독일","German Empire":"독일 제국",
+  "East Germany":"동독","West Germany":"서독","Prussia":"프로이센","Bavaria":"바이에른","Saxony":"작센",
+  "Württemberg":"뷔르템베르크","Hanover":"하노버","Italy":"이탈리아","Kingdom of Italy":"이탈리아 왕국",
+  "Papal States":"교황령","Kingdom of Sardinia":"사르데냐 왕국","Kingdom of the Two Sicilies":"양시칠리아 왕국",
+  "Austria":"오스트리아","Austrian Empire":"오스트리아 제국","Austria Hungary":"오스트리아-헝가리",
+  "Austro-Hungarian Empire":"오스트리아-헝가리","Hungary":"헝가리","Switzerland":"스위스",
+  "Netherlands":"네덜란드","Belgium":"벨기에","Luxembourg":"룩셈부르크","Denmark":"덴마크","Norway":"노르웨이",
+  "Sweden":"스웨덴","Finland":"핀란드","Iceland":"아이슬란드","Ireland":"아일랜드","Poland":"폴란드",
+  "Czechoslovakia":"체코슬로바키아","Czech Republic":"체코","Slovakia":"슬로바키아","Yugoslavia":"유고슬라비아",
+  "Serbia":"세르비아","Montenegro":"몬테네그로","Croatia":"크로아티아","Bosnia and Herzegovina":"보스니아 헤르체고비나",
+  "Albania":"알바니아","Macedonia":"북마케도니아","Greece":"그리스","Romania":"루마니아","Bulgaria":"불가리아",
+  "Ukraine":"우크라이나","Lithuania":"리투아니아","Latvia":"라트비아","Estonia":"에스토니아",
+  "Georgia":"조지아","Armenia":"아르메니아","Azerbaijan":"아제르바이잔","Kazakhstan":"카자흐스탄",
+  "Uzbekistan":"우즈베키스탄","Turkmenistan":"투르크메니스탄","Kyrgyzstan":"키르기스스탄","Tajikistan":"타지키스탄",
+  "Moldova":"몰도바","Cyprus":"키프로스","Malta":"몰타",
+  "Denmark-Norway":"덴마크-노르웨이","Sweden–Norway":"스웨덴-노르웨이",
+  "Hawaii":"하와이","Liechtenstein":"리히텐슈타인","Andorra":"안도라","San Marino":"산마리노"
+};
+function koName(n){ return Object.prototype.hasOwnProperty.call(KO, n) ? KO[n] : n; }
+
+/* ---------- 상태 ---------- */
+var svg = d3.select('#globe');
+var projection = d3.geoOrthographic().clipAngle(90).rotate(INIT_ROT.slice());
+var path = d3.geoPath(projection);
+var graticule = d3.geoGraticule10();
+
+var cache = {};       // 연도 스냅샷 캐시 (Promise)
+var features = [];    // 현재 표시 중인 국경 항목
+var snap = null;      // 현재 표시 중인 데이터 연도
+var curYear = 1900;   // 슬라이더 연도 (실시간)
+var selName = null;   // 선택한 국가의 NAME
+var baseScale = 200;
+
+/* ---------- 유틸 ---------- */
+function snapFor(y){
+  var s = YEARS[0];
+  for (var i = 0; i < YEARS.length; i++){ if (YEARS[i] <= y) s = YEARS[i]; }
+  return s;
+}
+function setStatus(msg){
+  var el = document.getElementById('status');
+  el.textContent = msg || '';
+  el.style.display = msg ? '' : 'none';
+}
+function parseSnap(geo){
+  return (geo.features || []).map(function(f){
+    var p = f.properties || {};
+    var name = (p.NAME || p.SUBJECTO || '').trim();   // 이름 없는 조각은 라벨에서 제외
+    return {
+      geo: f,
+      name: name,
+      ko: koName(name),
+      prec: p.BORDERPRECISION,
+      c: d3.geoCentroid(f),
+      a: d3.geoArea(f)
+    };
+  });
+}
+
+/* ---------- 데이터 로딩 ---------- */
+function loadSnap(s){
+  if (location.protocol === 'file:'){   // 파일을 직접 열면 data 폴더를 읽을 수 없음
+    setStatus('지도 데이터를 읽지 못했습니다. GitHub Pages나 로컬 서버에서 열어 주세요.');
+    return;
+  }
+  if (!cache[s]){
+    cache[s] = fetch(DATA_DIR + 'world_' + s + '.geojson')
+      .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(parseSnap)
+      .catch(function(err){ delete cache[s]; throw err; });
+  }
+  setStatus('데이터를 불러오는 중…');
+  cache[s].then(function(items){
+    if (snapFor(curYear) !== s) return;   // 그 사이 다른 연도로 바뀌었으면 무시
+    applySnap(s, items);
+  }).catch(function(){
+    if (snapFor(curYear) !== s) return;
+    setStatus(location.protocol === 'file:'
+      ? '지도 데이터를 읽지 못했습니다. GitHub Pages나 로컬 서버에서 열어 주세요.'
+      : '지도 데이터를 찾을 수 없습니다. data 폴더를 확인해 주세요.');
+  });
+}
+
+function applySnap(s, items){
+  snap = s;
+  features = items;
+  setStatus('');
+  updateInfo();
+  draw();
+}
+
+/* ---------- 그리기 ---------- */
+function draw(){
+  d3.select('#sphere').attr('d', path({type:'Sphere'}))
+    .attr('fill', '#cfe2ff').attr('stroke', '#3182f6').attr('stroke-width', 1.5).attr('stroke-opacity', 0.6);
+  d3.select('#grid').attr('d', path(graticule))
+    .attr('fill', 'none').attr('stroke', '#4a8df0').attr('stroke-opacity', 0.45).attr('stroke-width', 0.8);
+
+  var sel = d3.select('#lands').selectAll('path').data(features);
+  sel.enter().append('path')
+      .attr('stroke', '#ffffff').attr('stroke-width', 0.8).attr('stroke-linejoin', 'round')
+      .on('click', function(e, d){ selectItem(d); })
+    .merge(sel)
+      .attr('d', function(d){ return path(d.geo); })
+      .attr('fill', '#3182f6')
+      .attr('fill-opacity', function(d){ return d.name === selName ? 1 : 0.8; });
+  sel.exit().remove();
+
+  // 라벨: 앞면에 있고 충분히 큰 나라만
+  var center = [-projection.rotate()[0], -projection.rotate()[1]];
+  var labs = [];
+  var placed = [];
+  features
+    .filter(function(d){ return d.name && (d.a > 0.004 || d.name === selName) && d3.geoDistance(d.c, center) < Math.PI/2 - 0.05; })
+    .sort(function(a, b){ return b.a - a.a; })     // 큰 나라 우선
+    .forEach(function(d){
+      var p = projection(d.c);
+      if (!p) return;
+      var w = d.ko.length * 7 + 8, h = 16;          // 라벨 크기 대략치
+      var bx = { x0: p[0]-w/2, x1: p[0]+w/2, y0: p[1]-h/2, y1: p[1]+h/2 };
+      var hit = placed.some(function(q){ return bx.x0 < q.x1 && bx.x1 > q.x0 && bx.y0 < q.y1 && bx.y1 > q.y0; });
+      if (hit && d.name !== selName) return;
+      placed.push(bx);
+      labs.push({ t: d.ko, x: p[0], y: p[1] });
+    });
+  var L = d3.select('#labels').selectAll('text').data(labs);
+  L.enter().append('text')
+      .attr('text-anchor', 'middle').attr('font-size', 12).attr('font-weight', 600)
+      .attr('fill', '#191f28').attr('stroke', '#ffffff').attr('stroke-width', 3).attr('paint-order', 'stroke')
+    .merge(L)
+      .attr('x', function(d){ return d.x.toFixed(1); })
+      .attr('y', function(d){ return (d.y + 4).toFixed(1); })
+      .text(function(d){ return d.t; });
+  L.exit().remove();
+}
+
+function layout(){
+  var box = document.getElementById('globe').getBoundingClientRect();
+  var W = Math.max(200, box.width), H = Math.max(200, box.height);
+  svg.attr('viewBox', '0 0 ' + W.toFixed(0) + ' ' + H.toFixed(0));
+  baseScale = Math.min(W, H) / 2 * 0.86;
+  projection.scale(baseScale).translate([W/2, H/2]);
+  draw();
+  placeBubble();
+}
+
+/* ---------- 회전 ---------- */
+svg.call(d3.drag()
+  .clickDistance(4)
+  .on('start', function(){ svg.classed('grabbing', true); })
+  .on('drag', function(e){
+    var r = projection.rotate();
+    var lat = Math.max(-85, Math.min(85, -r[1] - e.dy * 0.3));
+    projection.rotate([r[0] + e.dx * 0.4, -lat, r[2]]);
+    draw();
+  })
+  .on('end', function(){ svg.classed('grabbing', false); }));
+
+function rotateTo(target, ms){
+  var r0 = projection.rotate();
+  d3.transition().duration(ms || 700).tween('rot', function(){
+    var i = d3.interpolate(r0, target);
+    return function(t){ projection.rotate(i(t)); draw(); };
+  });
+}
+
+/* ---------- 국가 선택 ---------- */
+function selectItem(d){
+  selName = d.name;
+  updateInfo();
+  var r0 = projection.rotate();
+  var dl = ((-d.c[0] - r0[0]) % 360 + 540) % 360 - 180;   // 가까운 쪽으로 회전
+  rotateTo([r0[0] + dl, -d.c[1], 0]);
+}
+
+function resetView(){
+  selName = null;
+  updateInfo();
+  rotateTo(INIT_ROT.slice());
+}
+document.getElementById('resetBtn').onclick = resetView;
+
+/* ---------- 정보 패널 ---------- */
+function updateInfo(){
+  document.getElementById('yearLabel').textContent = curYear + '년';
+  var note = snap === null ? '' :
+    (snap === curYear ? '데이터 ' + snap + '년 기준'
+                      : '데이터 ' + snap + '년 기준 (가장 가까운 앞 시점)');
+  document.getElementById('snapNote').textContent = note;
+
+  var it = selName ? features.filter(function(d){ return d.name === selName; })[0] : null;
+  document.getElementById('pickName').textContent = it ? it.ko : '—';
+
+  var pv = document.getElementById('precVal');
+  var p = it ? PREC[it.prec] : null;
+  pv.textContent = p ? p[0] : '—';
+  pv.style.color = p ? p[1] : 'var(--ink)';
+
+  var dsp = it ? DISPUTES[it.name] : null;
+  document.getElementById('disputeVal').innerHTML =
+    dsp ? '<span class="chip chip-red">' + dsp + '</span>' : '<span class="chip">없음</span>';
+}
+
+/* ---------- 연도 슬라이더 ---------- */
+function placeBubble(){
+  var r = document.getElementById('yearRange');
+  var rr = r.getBoundingClientRect();
+  var ar = document.querySelector('.slider-area').getBoundingClientRect();
+  var pct = (curYear - 1800) / 226;
+  // 손잡이(24px) 중심이 움직이는 범위에 맞춤
+  document.getElementById('bubble').style.left = ((rr.left - ar.left) + 12 + (rr.width - 24) * pct) + 'px';
+}
+
+function setYear(y){
+  curYear = y;
+  var r = document.getElementById('yearRange');
+  r.value = y;
+  r.style.setProperty('--p', ((y - 1800) / 226 * 100).toFixed(2) + '%');
+  document.getElementById('bubble').textContent = y + '년';
+  placeBubble();
+  var s = snapFor(y);
+  if (s !== snap) loadSnap(s);
+  else updateInfo();
+}
+
+document.getElementById('yearRange').addEventListener('input', function(){
+  setYear(parseInt(this.value, 10));
+});
+
+/* ---------- 시작 ---------- */
+document.getElementById('note').textContent =
+  '데이터 출처: historical-basemaps (GPL-3.0). 선택한 연도에 자료가 없으면 가장 가까운 앞 시점의 국경을 씁니다.';
+window.addEventListener('resize', layout);
+layout();
+setYear(1900);
+</script>
+</body>
+</html>
