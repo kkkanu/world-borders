@@ -25,7 +25,7 @@
     font-family:'Pretendard','Nanum Gothic',-apple-system,sans-serif;
     -webkit-font-smoothing:antialiased;
   }
-  .app{max-width:1024px;margin:0 auto;padding:20px;}
+  .app{max-width:1500px;margin:0 auto;padding:20px;}
   .title{font-size:22px;font-weight:700;letter-spacing:-0.3px;}
   .sub{font-size:14px;color:var(--sub);margin-top:4px;}
 
@@ -49,8 +49,8 @@
   .scale{display:flex;justify-content:space-between;font-size:13px;color:var(--sub);}
 
   /* 지구본 + 정보 패널 */
-  .stage{display:grid;grid-template-columns:minmax(0,1fr) 210px;gap:12px;margin-top:14px;}
-  .globe-box{position:relative;height:460px;border-radius:16px;background:var(--surface);overflow:hidden;}
+  .stage{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:12px;margin-top:14px;}
+  .globe-box{position:relative;height:min(78vh,900px);border-radius:16px;background:var(--surface);overflow:hidden;}
   #globe{display:block;width:100%;height:100%;touch-action:none;cursor:grab;}
   #globe.grabbing{cursor:grabbing;}
   .status{position:absolute;left:0;right:0;bottom:14px;text-align:center;font-size:13px;color:var(--sub);pointer-events:none;}
@@ -98,6 +98,7 @@
       <svg id="globe" role="img" aria-label="드래그로 회전하는 세계 국경 지구본">
         <title>세계 국경 지구본</title>
         <desc>끌어서 회전하고, 국가를 누르면 그 나라가 가운데로 옵니다.</desc>
+        <defs><clipPath id="landClip"><path id="landMask"></path></clipPath></defs>
         <path id="sphere"></path>
         <path id="grid"></path>
         <g id="lands"></g>
@@ -132,6 +133,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 <script>
 /* ==================================================================
    세계 국경 변천
@@ -232,6 +234,7 @@ var curYear = 1900;   // 슬라이더 연도 (실시간)
 var selName = null;   // 선택한 국가의 NAME
 var baseScale = 200;
 var scaleK = 1;       // 확대 배율 (1 = 기본, 최대 6)
+var landFeature = null;   // 실제 육지(해안선) — 바다를 가리는 clip 용
 
 /* ---------- 유틸 ---------- */
 function snapFor(y){
@@ -297,6 +300,11 @@ function draw(){
     .attr('fill', '#ffffff').attr('stroke', '#3182f6').attr('stroke-width', 1.5).attr('stroke-opacity', 0.6);
   d3.select('#grid').attr('d', path(graticule))
     .attr('fill', 'none').attr('stroke', '#c9d6e8').attr('stroke-opacity', 0.9).attr('stroke-width', 0.7);
+
+  if (landFeature){                       // 국경을 실제 육지 모양으로 잘라 바다를 비움
+    d3.select('#landMask').attr('d', path(landFeature));
+    d3.select('#lands').attr('clip-path', 'url(#landClip)');
+  }
 
   var sel = d3.select('#lands').selectAll('path').data(features);
   sel.enter().append('path')
@@ -441,6 +449,15 @@ function setYear(y){
 document.getElementById('yearRange').addEventListener('input', function(){
   setYear(parseInt(this.value, 10));
 });
+
+/* ---------- 실제 육지(해안선) 불러오기 — 바다 영역 제거용 ---------- */
+fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json')
+  .then(function(r){ return r.json(); })
+  .then(function(topo){
+    landFeature = topojson.feature(topo, topo.objects.land);
+    draw();   // 육지가 준비되면 즉시 clip 적용
+  })
+  .catch(function(){ /* 실패하면 clip 없이 그대로 표시 */ });
 
 /* ---------- 시작 ---------- */
 document.getElementById('note').textContent =
