@@ -161,65 +161,57 @@ var DISPUTES = {
 
 // 자주 나오는 국가명 한글 표기. 없으면 원래 영문 이름을 씁니다.
 var KO = {
-  "Imperial Japan":"일본 제국","Empire of Japan":"일본 제국","Japan":"일본",
-  "Korea":"한국","Korea, Republic of":"대한민국","Korea, Democratic People's Republic of":"조선민주주의인민공화국",
-  "China":"중국","Qing Empire":"청나라","Manchu Empire":"청나라","Manchuria":"만주","Xinjiang":"신장","Tibet":"티베트",
-  "Mongolia":"몽골","Taiwan":"타이완","Hong Kong":"홍콩",
-  "Russia":"러시아","Russian Empire":"러시아 제국","USSR":"소련","Byelarus":"벨라루스",
-  "United States":"미국","United States of America":"미국",
-  "United Kingdom":"영국","United Kingdom of Great Britain and Ireland":"영국",
-  "British Raj":"영국령 인도","India":"인도","Pakistan":"파키스탄","Bangladesh":"방글라데시",
-  "Ceylon":"실론","Sri Lanka":"스리랑카","Nepal":"네팔","Bhutan":"부탄","Afghanistan":"아프가니스탄",
-  "Ottoman Empire":"오스만 제국","Ottoman Sultanate":"오스만 제국","Republic of Turkey":"튀르키예 공화국","Turkey":"튀르키예",
-  "Persia":"페르시아","Iran":"이란","Iraq":"이라크","Syria":"시리아","Israel":"이스라엘","Jordan":"요르단",
-  "Lebanon":"레바논","Saudi Arabia":"사우디아라비아","Arabia":"아라비아","Hejaz":"헤자즈","Nejd":"네지드",
-  "Yemen":"예멘","Oman":"오만","Kuwait":"쿠웨이트","Qatar":"카타르","United Arab Emirates":"아랍에미리트","Bahrain":"바레인",
-  "Egypt":"이집트","Sudan":"수단","Anglo-Egyptian Sudan":"앵글로-이집트령 수단","Libya":"리비아","Algeria":"알제리",
-  "Tunisia":"튀니지","Morocco":"모로코","Ethiopia":"에티오피아","Abyssinia":"아비시니아","Eritrea":"에리트레아",
-  "Somalia":"소말리아","Kenya":"케냐","Uganda":"우간다","Tanzania, United Republic of":"탄자니아","Rwanda":"르완다",
-  "Burundi":"부룬디","Congo":"콩고","Zaire":"자이르","Belgian Congo":"벨기에령 콩고","Angola":"앙골라",
-  "Mozambique":"모잠비크","Madagascar":"마다가스카르","Zambia":"잠비아","Zimbabwe":"짐바브웨","Malawi":"말라위",
-  "Namibia":"나미비아","Botswana":"보츠와나","Lesotho":"레소토","Swaziland":"스와질란드",
-  "South Africa":"남아프리카 공화국","Union of South Africa":"남아프리카 연방","Cape Colony":"케이프 식민지",
-  "Orange Free State":"오렌지 자유국","Transvaal":"트란스발","Natal":"나탈",
-  "Nigeria":"나이지리아","Ghana":"가나","Gold Coast":"황금해안","Ivory Coast":"코트디부아르",
-  "Senegal":"세네갈","Mali":"말리","Niger":"니제르","Chad":"차드","Cameroon":"카메룬","Gabon":"가봉",
-  "Liberia":"라이베리아","Sierra Leone":"시에라리온","Guinea":"기니","Togo":"토고","Benin":"베냉","Dahomey":"다호메이",
-  "Burkina Faso":"부르키나파소","Mauritania":"모리타니","Djibouti":"지부티","Gambia":"감비아","Gambia, The":"감비아",
-  "Central African Republic":"중앙아프리카 공화국","Equatorial Guinea":"적도 기니","Guinea-Bissau":"기니비사우",
-  "Western Sahara":"서사하라","Spanish Sahara":"스페인령 사하라",
-  "Thailand":"태국","Siam":"시암","Vietnam":"베트남","Annam":"안남","Tonkin":"통킹","Cochin China":"코친차이나",
-  "French Indochina":"프랑스령 인도차이나","Burma":"버마","Cambodia":"캄보디아","Laos":"라오스",
-  "Malaysia":"말레이시아","Singapore":"싱가포르","Brunei":"브루나이","Indonesia":"인도네시아",
-  "Dutch East Indies":"네덜란드령 동인도","Philippines":"필리핀",
-  "Australia":"호주","New Zealand":"뉴질랜드","Papua New Guinea":"파푸아뉴기니","Fiji":"피지","Samoa":"사모아",
-  "Tonga":"통가","Antarctica":"남극","Greenland":"그린란드","Kingdom of Hawaii":"하와이 왕국",
-  "Canada":"캐나다","Mexico":"멕시코","Guatemala":"과테말라","Honduras":"온두라스","Nicaragua":"니카라과",
-  "Costa Rica":"코스타리카","Panama":"파나마","El Salvador":"엘살바도르","Belize":"벨리즈","Cuba":"쿠바",
-  "Haiti":"아이티","Dominican Republic":"도미니카 공화국","Puerto Rico":"푸에르토리코","Jamaica":"자메이카",
-  "Bahamas":"바하마","Barbados":"바베이도스","Trinidad":"트리니다드","Guyana":"가이아나","Suriname":"수리남",
-  "Brazil":"브라질","Kingdom of Brazil":"브라질 왕국","Argentina":"아르헨티나","Chile":"칠레","Peru":"페루",
-  "Bolivia":"볼리비아","Paraguay":"파라과이","Uruguay":"우루과이","Ecuador":"에콰도르","Colombia":"콜롬비아",
-  "Venezuela":"베네수엘라",
-  "Portugal":"포르투갈","Spain":"스페인","France":"프랑스","Germany":"독일","German Empire":"독일 제국",
-  "East Germany":"동독","West Germany":"서독","Prussia":"프로이센","Bavaria":"바이에른","Saxony":"작센",
-  "Württemberg":"뷔르템베르크","Hanover":"하노버","Italy":"이탈리아","Kingdom of Italy":"이탈리아 왕국",
-  "Papal States":"교황령","Kingdom of Sardinia":"사르데냐 왕국","Kingdom of the Two Sicilies":"양시칠리아 왕국",
-  "Austria":"오스트리아","Austrian Empire":"오스트리아 제국","Austria Hungary":"오스트리아-헝가리",
-  "Austro-Hungarian Empire":"오스트리아-헝가리","Hungary":"헝가리","Switzerland":"스위스",
-  "Netherlands":"네덜란드","Belgium":"벨기에","Luxembourg":"룩셈부르크","Denmark":"덴마크","Norway":"노르웨이",
-  "Sweden":"스웨덴","Finland":"핀란드","Iceland":"아이슬란드","Ireland":"아일랜드","Poland":"폴란드",
-  "Czechoslovakia":"체코슬로바키아","Czech Republic":"체코","Slovakia":"슬로바키아","Yugoslavia":"유고슬라비아",
-  "Serbia":"세르비아","Montenegro":"몬테네그로","Croatia":"크로아티아","Bosnia and Herzegovina":"보스니아 헤르체고비나",
-  "Albania":"알바니아","Macedonia":"북마케도니아","Greece":"그리스","Romania":"루마니아","Bulgaria":"불가리아",
-  "Ukraine":"우크라이나","Lithuania":"리투아니아","Latvia":"라트비아","Estonia":"에스토니아",
-  "Georgia":"조지아","Armenia":"아르메니아","Azerbaijan":"아제르바이잔","Kazakhstan":"카자흐스탄",
-  "Uzbekistan":"우즈베키스탄","Turkmenistan":"투르크메니스탄","Kyrgyzstan":"키르기스스탄","Tajikistan":"타지키스탄",
-  "Moldova":"몰도바","Cyprus":"키프로스","Malta":"몰타",
-  "Denmark-Norway":"덴마크-노르웨이","Sweden–Norway":"스웨덴-노르웨이",
-  "Hawaii":"하와이","Liechtenstein":"리히텐슈타인","Andorra":"안도라","San Marino":"산마리노"
+  "Abyssinia":"아비시니아","Afghanistan":"아프가니스탄","Air":"아이르","Algeria":"알제리","Algeria (FR)":"알제리","Algeria (France)":"알제리","Algiers":"알제",
+  "Anglo-Egyptian Sudan":"앵글로-이집트 수단","Angola":"앙골라","Angola (Portugal)":"앙골라","Annam":"안남","Antarctica":"남극","Arabia":"아라비아","Arabia (Nejd)":"아라비아",
+  "Argentina":"아르헨티나","Armenia":"아르메니아","Asante":"아샨티","Assam":"아삼","Australia":"호주","Austria Hungary":"오스트리아-헝가리","Austrian Empire":"오스트리아 제국",
+  "Austro-Hungarian Empire":"오스트리아-헝가리 제국","Austria":"오스트리아","Bagirmi":"바기르미","Belgian Congo":"벨기에령 콩고","Bokhara Khanate":"부하라 칸국","Bolivia":"볼리비아",
+  "Botswana":"보츠와나","Brazil":"브라질","British East Africa":"영국령 동아프리카","British East India Company":"영국 동인도 회사","British Guiana":"영국령 기아나",
+  "British Protectorate":"영국 보호령","British Raj":"영국령 인도","British Somaliland":"영국령 소말릴란드","Bulgaria":"불가리아","Bundelkhand":"분델칸드","Bunyoro":"부뇨로",
+  "Burkina Faso":"부르키나파소","Burma":"버마","Burundi":"부룬디","Byelarus":"벨라루스","Cambodia":"캄보디아","Cameroon":"카메룬","Canada":"캐나다","Cape Colony":"케이프 식민지",
+  "Central African Republic":"중앙아프리카 공화국","Chad":"차드","Chile":"칠레","China":"중국","Chinese Warlords":"중국 군벌","Chinese warlords":"중국 군벌","Colombia":"콜롬비아",
+  "Congo":"콩고","Congo (France)":"프랑스령 콩고","Cyraneica (UK Lybia)":"키레나이카","Darfur":"다르푸르","Denmark":"덴마크","Denmark-Norway":"덴마크-노르웨이",
+  "Dominion of Newfoundland":"뉴펀들랜드 자치령","Dutch East Indies":"네덜란드령 동인도","Dutch Guinea":"네덜란드령 기니","Ecuador":"에콰도르","Egypt":"이집트",
+  "Emirate of Bin Shal'an":"빈 샬란 토후국","Empire of Japan":"일본 제국","Ethiopia":"에티오피아","Ethiopia (Italy)":"이탈리아령 에티오피아","Far Eastern SSR":"극동 공화국",
+  "Fezzan (Frech Lybia)":"페잔","Finland":"핀란드","First Samori Empire":"사모리 제국","France":"프랑스","French Cameroons":"프랑스령 카메룬","French Equatorial Africa":"프랑스령 적도아프리카",
+  "French Indo-China":"프랑스령 인도차이나","French Indochina":"프랑스령 인도차이나","French West Africa":"프랑스령 서아프리카","Fulani Empire":"풀라니 제국","Funj":"푼지 술탄국",
+  "Gabon":"가봉","German E. Africa (Tanganyika)":"독일령 동아프리카","German Empire":"독일 제국","German South-West Africa":"독일령 남서아프리카","Germany":"독일","Ghana":"가나",
+  "Gold Coast":"골드코스트","Greenland":"그린란드","Guiana":"기아나","Guinea":"기니","Guyana":"가이아나","Hausa States":"하우사 도시국가","Hejaz":"헤자즈","Imerina":"이메리나 왕국",
+  "Imperial Japan":"일본 제국","India":"인도","Indonesia":"인도네시아","Inupiaq":"이누피아트","Iran":"이란","Iraq":"이라크","Italian Somaliland":"이탈리아령 소말릴란드","Italy":"이탈리아",
+  "Ivory Coast":"코트디부아르","Japan":"일본","Japan (USA)":"미군정 일본","Kaarta":"카르타","Kamerun":"독일령 카메룬","Kanem-Bornu":"카넴-보르누","Kazakhstan":"카자흐스탄","Kenya":"케냐",
+  "Kingdom of Brazil":"브라질 왕국","Kingdom of Italy":"이탈리아 왕국","Kokatha":"코카타","Kong Empire":"콩 제국","Korea":"한국","Kyrgyzstan":"키르기스스탄","Laos":"라오스","Libya":"리비아",
+  "Libya (IT)":"이탈리아령 리비아","Lozi":"로지","Luba":"루바","Luisiana":"루이지애나","Lunda":"룬다","M?ori":"마오리","Madagascar":"마다가스카르","Madagascar (France)":"프랑스령 마다가스카르",
+  "Malaya":"말라야","Malaysia":"말레이시아","Mali":"말리","Manchu Empire":"만주 제국","Manchuria":"만주","Maori":"마오리","Maratha Confederacy":"마라타 동맹","Mardu":"마르두","Mauritania":"모리타니",
+  "Mesopotamia (GB)":"영국령 메소포타미아","Mexico":"멕시코","Mirambo Unyanyembe Ukimbu":"미람보","Mongolia":"몽골","Morocco":"모로코","Morocco (France)":"프랑스령 모로코","Mossi States":"모시 왕국",
+  "Mozambique":"모잠비크","Mozambique (Portugal)":"포르투갈령 모잠비크","Muscat and Oman":"무스카트 오만","Māori":"마오리","Namibia":"나미비아","Nejd":"네지드","Nepal":"네팔",
+  "Netherlands Indies":"네덜란드령 동인도","New South Wales":"뉴사우스웨일스","New South Wales (UK)":"뉴사우스웨일스","New Zealand":"뉴질랜드","Niger":"니제르","Nigeria":"나이지리아",
+  "Nizam's Dominions":"하이데라바드","Northern Rhodesia":"북로디지아","Northern Territory (UK)":"노던 준주","Norway":"노르웨이","Oman":"오만","Oman (British Raj)":"오만","Oromo":"오로모",
+  "Ottoman Empire":"오스만 제국","Ottoman Sultanate":"오스만 제국","Pakistan":"파키스탄","Pampas cultures":"팜파스 원주민","Papua New Guinea":"파푸아뉴기니","Papuans":"파푸아인","Paraguay":"파라과이",
+  "Patagonian shellfish and marine mammal hunters":"파타고니아 수렵민","Persia":"페르시아","Peru":"페루","Philippines":"필리핀","Pintupi":"핀투피","Poland":"폴란드","Portuguese East Africa":"포르투갈령 동아프리카",
+  "Prussia":"프로이센","Qing Empire":"청나라","Quebec":"퀘벡","Queensland (UK)":"퀸즐랜드","Rajputs":"라지푸트","Rattanakosin Kingdom":"라타나코신 왕국","Republic of Turkey":"튀르키예 공화국",
+  "Rhodesia":"로디지아","Rift Valley States":"리프트밸리 국가들","Rio De Oro":"리오데오로","Romania":"루마니아","Rupert's Land":"루퍼트랜드","Russia":"러시아","Russian Empire":"러시아 제국","Rwanda":"르완다",
+  "Saudi Arabia":"사우디아라비아","Segu":"세구","Senegal":"세네갈","Siam":"시암","Sikhs":"시크 제국","Sokoto Caliphate":"소코토 칼리파국","Somalia":"소말리아","South Africa":"남아프리카",
+  "South Australia (UK)":"사우스오스트레일리아","Southern Rhodesia":"남로디지아","Spain":"스페인","Sudan":"수단","Sultanate of Utetera":"우테테라 술탄국","Sultanate of Zanzibar":"잔지바르 술탄국",
+  "Sultinate of Zanzibar":"잔지바르 술탄국","Sweden":"스웨덴","Sweden–Norway":"스웨덴-노르웨이","Syria":"시리아","Syria (France)":"프랑스령 시리아","T'atsaot'ine":"타초티네","Tanzania, United Republic of":"탄자니아",
+  "Thailand":"태국","Tibet":"티베트","Transvaal":"트란스발","Tripolitana (UK Lybia)":"트리폴리타니아","Tukular Caliphate":"투쿨로르 제국","Turan":"투란","Turkey":"튀르키예","Turkmenistan":"투르크메니스탄",
+  "USSR":"소련","Uganda":"우간다","Ukraine":"우크라이나","Union of South Africa":"남아프리카 연방","United Kingdom":"영국","United Kingdom of Great Britain and Ireland":"영국","UK":"영국",
+  "United Provinces of the Río de la Plata":"리오데라플라타 연합주","United States":"미국","United States of America":"미국","USA":"미국","Uruguay":"우루과이","Uzbekistan":"우즈베키스탄","Venezuela":"베네수엘라",
+  "Viceroyalty of Brazil":"브라질 부왕령","Viceroyalty of New Granada":"누에바그라나다 부왕령","Viceroyalty of New Spain":"누에바에스파냐 부왕령","Viceroyalty of Peru":"페루 부왕령","Viceroyalty of the Río de la Plata":"리오데라플라타 부왕령",
+  "Victoria (UK)":"빅토리아","Vietnam":"베트남","Wadai Empire":"와다이 제국","West Germany":"서독","Western Australia (UK)":"웨스턴오스트레일리아","Western Sahara":"서사하라","White Russia":"벨라루스",
+  "Wiradjuri":"위라주리","Xinjiang":"신장","Yeke":"예케","Yemen":"예멘","Yemen (UK)":"영국령 예멘","Yugoslavia":"유고슬라비아","Yup'ik & Cup'ik":"유픽","Zaire":"자이르","Zaire (Belgium)":"벨기에령 콩고",
+  "Zambia":"잠비아","Zanzibar":"잔지바르","Zimbabwe":"짐바브웨","central Asian khanates":"중앙아시아 칸국","Đại Việt":"대월","Japan (USSR)":"소련 점령 일본","Korea, Republic of":"대한민국",
+  "Korea, Democratic People's Republic of":"조선민주주의인민공화국","North Korea":"조선민주주의인민공화국","South Korea":"대한민국","Netherlands":"네덜란드","Belgium":"벨기에","Portugal":"포르투갈","Habsburg Austria":"합스부르크 오스트리아"
 };
 function koName(n){ return Object.prototype.hasOwnProperty.call(KO, n) ? KO[n] : n; }
+
+/* 표기 규칙: 국가 → 이름, 지명(식민지·속령) → (이름), 분쟁지역 → ((이름)) */
+function isDispute(subj){ return /claim|disput|\bvs\b|대 /i.test(subj || ''); }
+function labelText(d){
+  var ko = d.ko;
+  if (DISPUTES[d.name] || isDispute(d.subj)) return '((' + ko + '))';
+  // 다른 세력이 지배하는 속령/식민지는 지명으로 본다 (같은 나라의 다른 표기는 제외)
+  if (d.subj && d.subj !== d.name && koName(d.subj) !== ko) return '(' + ko + ')';
+  return ko;
+}
 
 /* ---------- 상태 ---------- */
 var svg = d3.select('#globe');
@@ -255,6 +247,7 @@ function parseSnap(geo){
       geo: f,
       name: name,
       ko: koName(name),
+      subj: (p.SUBJECTO || '').trim(),
       prec: p.BORDERPRECISION,
       c: d3.geoCentroid(f),
       a: d3.geoArea(f)
@@ -331,7 +324,7 @@ function draw(){
       var hit = placed.some(function(q){ return bx.x0 < q.x1 && bx.x1 > q.x0 && bx.y0 < q.y1 && bx.y1 > q.y0; });
       if (hit && d.name !== selName) return;
       placed.push(bx);
-      labs.push({ t: d.ko, x: p[0], y: p[1] });
+      labs.push({ t: labelText(d), x: p[0], y: p[1] });
     });
   var L = d3.select('#labels').selectAll('text').data(labs);
   L.enter().append('text')
@@ -372,7 +365,7 @@ svg.call(d3.drag()
   .on('start', function(){ svg.classed('grabbing', true); })
   .on('drag', function(e){
     var r = projection.rotate();
-    var lat = Math.max(-85, Math.min(85, -r[1] - e.dy * 0.3));
+    var lat = Math.max(-85, Math.min(85, -r[1] + e.dy * 0.3));
     projection.rotate([r[0] + e.dx * 0.4, -lat, r[2]]);
     draw();
   })
@@ -412,7 +405,7 @@ function updateInfo(){
   document.getElementById('snapNote').textContent = note;
 
   var it = selName ? features.filter(function(d){ return d.name === selName; })[0] : null;
-  document.getElementById('pickName').textContent = it ? it.ko : '—';
+  document.getElementById('pickName').textContent = it ? labelText(it) : '—';
 
   var pv = document.getElementById('precVal');
   var p = it ? PREC[it.prec] : null;
