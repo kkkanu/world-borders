@@ -240,7 +240,7 @@ function setStatus(msg){
   el.style.display = msg ? '' : 'none';
 }
 function parseSnap(geo){
-  return (geo.features || []).map(function(f){
+  var items = (geo.features || []).map(function(f){
     var p = f.properties || {};
     var name = (p.NAME || p.SUBJECTO || '').trim();   // 이름 없는 조각은 라벨에서 제외
     return {
@@ -253,6 +253,56 @@ function parseSnap(geo){
       a: d3.geoArea(f)
     };
   });
+  colorize(items);   // 맞닿은 나라끼리 다른 투명도 배정
+  return items;
+}
+
+/* ---------- 인접국 구분: 같은 파랑에서 투명도 단계만 다르게 ---------- */
+function eachCoord(coords, fn){
+  if (typeof coords[0] === 'number'){ fn(coords[0], coords[1]); return; }
+  for (var i = 0; i < coords.length; i++) eachCoord(coords[i], fn);
+}
+function colorize(items){
+  var cellMap = {};   // 1도 격자 셀 -> 그 셀을 지나는 feature 인덱스들
+  items.forEach(function(d, i){
+    d.adj = {}; d.level = null; d.maxLv = 0;
+    var cells = {};
+    if (d.geo.geometry && d.geo.geometry.coordinates){
+      eachCoord(d.geo.geometry.coordinates, function(lon, lat){
+        cells[Math.floor(lon) + ',' + Math.floor(lat)] = 1;
+      });
+    }
+    for (var k in cells){
+      if (!cellMap[k]) cellMap[k] = [];
+      cellMap[k].push(i);
+    }
+  });
+  // 같은 격자 셀을 공유하면 인접(경계가 맞닿음)으로 본다
+  for (var k in cellMap){
+    var list = cellMap[k];
+    if (list.length < 2) continue;
+    for (var a = 0; a < list.length; a++)
+      for (var b = a + 1; b < list.length; b++){
+        items[list[a]].adj[list[b]] = 1;
+        items[list[b]].adj[list[a]] = 1;
+      }
+  }
+  // 그리디 그래프 색칠: 인접국과 다른 가장 낮은 단계를 배정
+  var order = items.map(function(d, i){ return i; })
+    .sort(function(x, y){ return Object.keys(items[y].adj).length - Object.keys(items[x].adj).length; });
+  var maxLv = 0;
+  order.forEach(function(i){
+    var used = {};
+    for (var j in items[i].adj){ if (items[j].level != null) used[items[j].level] = 1; }
+    var lv = 0; while (used[lv]) lv++;
+    items[i].level = lv;
+    if (lv > maxLv) maxLv = lv;
+  });
+  items.forEach(function(d){ d.maxLv = maxLv; });
+}
+function opacityFor(d){
+  if (d.maxLv <= 0 || d.level == null) return 0.78;
+  return 0.42 + (d.level / d.maxLv) * 0.5;   // 0.42 ~ 0.92
 }
 
 /* ---------- 데이터 로딩 ---------- */
@@ -301,12 +351,12 @@ function draw(){
 
   var sel = d3.select('#lands').selectAll('path').data(features);
   sel.enter().append('path')
-      .attr('stroke', '#ffffff').attr('stroke-width', 0.8).attr('stroke-linejoin', 'round')
+      .attr('stroke', '#ffffff').attr('stroke-width', 1).attr('stroke-linejoin', 'round')
       .on('click', function(e, d){ selectItem(d); })
     .merge(sel)
       .attr('d', function(d){ return path(d.geo); })
       .attr('fill', '#3182f6')
-      .attr('fill-opacity', function(d){ return d.name === selName ? 1 : 0.8; });
+      .attr('fill-opacity', function(d){ return d.name === selName ? 1 : opacityFor(d); });
   sel.exit().remove();
 
   // 라벨: 앞면에 있고 충분히 큰 나라만
